@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGROW</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font-family:Arial}
+button{cursor:pointer;border:1px solid #00eaff;background:#091719;color:#fff;border-radius:12px;padding:12px}
+.header{height:65px;border-bottom:1px solid #00eaff;display:flex;align-items:center;padding:8px 15px}
+.logo{width:48px;height:48px;border:2px solid #00eaff;border-radius:50%;display:grid;place-items:center;color:#00eaff;font-size:27px;font-weight:bold}
+.brand{margin-left:10px;color:#00eaff;font-size:22px}.tag{font-size:10px;color:#999}
+#home{text-align:center;padding:45px 15px}.title{font-size:40px;color:#00eaff}
+.grid{max-width:600px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid button{min-height:55px}
+.sec{display:none}.top{height:58px;border-bottom:1px solid #17434a;display:flex;align-items:center;justify-content:space-between;padding:8px 12px}.top b{color:#00eaff}
+#chat.full{display:flex;position:fixed;inset:0;z-index:10;background:#050505;flex-direction:column}
+.messages{flex:1;overflow:auto;padding:12px}.msg{padding:12px;margin:8px 0;border-radius:14px;max-width:90%;white-space:pre-wrap}.u{background:#00eaff;color:#000;margin-left:auto}.a{background:#101b1e;border:1px solid #17434a}
+.input{display:flex;padding:7px;border-top:1px solid #17434a;gap:5px}.input input{flex:1;min-width:0}
+input,textarea,select{background:#080808;color:#fff;border:1px solid #00eaff;border-radius:10px;padding:12px;margin:5px 0;width:100%}
+.send{background:#00eaff;color:#000}.page{max-width:800px;margin:auto;padding:15px}.card{background:#0d1719;border:1px solid #17434a;border-radius:15px;padding:15px;margin:10px 0}
+.drawer{position:fixed;right:-290px;top:0;width:280px;height:100%;background:#071114;z-index:20;padding:18px;transition:.2s;overflow:auto}.drawer.open{right:0}.drawer button{width:100%;margin:4px 0}.drawer h3{color:#00eaff}.shade{display:none;position:fixed;inset:0;background:#0009;z-index:19}.shade.on{display:block}
+.primary{background:#00eaff;color:#000;font-weight:bold;width:100%;margin:5px 0}
+.preview{display:none}.preview img{width:100%;max-height:300px;object-fit:contain;border:1px solid #00eaff}
+.option{width:100%;text-align:left;margin:5px 0}.correct{border-color:#0f5!important}.wrong{border-color:red!important}
+.score{text-align:center;color:#00eaff;font-size:32px;padding:20px}
+</style>
+</head>
+<body>
+
+<header class="header">
+<div class="logo">A</div>
+<div class="brand">AGROW<div class="tag">Ask. Understand. Grow. Fly.</div></div>
+</header>
+
+<div id="home">
+<div class="title">AGROW</div>
+<p>Ask. Understand. Grow. Fly.</p>
+<div class="grid">
+<button onclick="chat()">💬 Chat</button>
+<button onclick="show('scan')">📸 Scan Question</button>
+<button onclick="show('quiz')">📝 Quiz</button>
+<button onclick="show('flash')">🧠 Flashcards</button>
+<button onclick="show('explain')">📚 Explain Simply</button>
+<button onclick="show('history')">🕘 History</button>
+<button onclick="show('progress')">📊 Progress</button>
+<button onclick="show('bookmarks')">🔖 Bookmarks</button>
+</div>
+</div>
+
+<section id="chat" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>AGROW Chat</b><button onclick="drawer()">☰</button></div>
+<div id="messages" class="messages"></div>
+<div class="input">
+<button onclick="voice()">🎤</button>
+<input id="q" placeholder="Ask AGROW..." onkeydown="if(event.key=='Enter')send()">
+<button class="send" onclick="send()">➤</button>
+</div>
+</section>
+
+<div id="shade" class="shade" onclick="closeDrawer()"></div>
+<div id="drawer" class="drawer">
+<h2 style="color:#00eaff">⚙ Settings</h2>
+<h3>Subject</h3>
+<button onclick="sub('General')">General</button>
+<button onclick="sub('Hindi')">Hindi</button>
+<button onclick="sub('English')">English</button>
+<button onclick="sub('Maths')">Maths</button>
+<button onclick="sub('SST')">SST</button>
+<button onclick="sub('Science')">Science</button>
+<h3>Answer</h3>
+<button onclick="mode='Short';closeDrawer()">⚡ Short</button>
+<button onclick="mode='Medium';closeDrawer()">📚 Medium</button>
+<button onclick="mode='Detailed';closeDrawer()">🧠 Detailed</button>
+<h3>Tools</h3>
+<button onclick="speak()">🔊 Read Answer</button>
+<button onclick="bookmark()">🔖 Bookmark</button>
+<button onclick="clearChat()">🗑 Clear Chat</button>
+</div>
+
+<section id="scan" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>📸 Question Scanner</b></div>
+<div class="page">
+<div class="card">
+<input type="file" id="photo" accept="image/*" onchange="preview(event)">
+<div id="pv" class="preview"><img id="pic"></div>
+</div>
+<textarea id="sq" placeholder="Type or correct the question here..."></textarea>
+<button class="primary" onclick="solveScan()">🧠 Solve</button>
+<div id="sa" class="card"></div>
+</div>
+</section>
+
+<section id="quiz" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>📝 Quiz Mode</b></div>
+<div class="page"><div class="card">
+<select id="qs"><option>Science</option><option>Maths</option><option>SST</option><option>English</option><option>Hindi</option></select>
+<button class="primary" onclick="startQuiz()">Start Quiz</button>
+<div id="qa"></div>
+</div></div>
+</section>
+
+<section id="flash" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>🧠 Flashcards</b></div>
+<div class="page"><div class="card">
+<h2 id="fq"></h2><p id="fa" style="display:none"></p>
+<button class="primary" onclick="flip()">Show Answer</button>
+<button class="primary" onclick="nextF()">Next</button>
+</div></div>
+</section>
+
+<section id="explain" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>📚 Explain Simply</b></div>
+<div class="page">
+<input id="topic" placeholder="Enter topic">
+<select id="em"><option>Very Simple</option><option>Exam Ready</option><option>Deep Understanding</option></select>
+<button class="primary" onclick="exp()">Explain</button>
+<div id="ea" class="card"></div>
+</div>
+</section>
+
+<section id="history" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>🕘 History</b></div>
+<div class="page"><div id="hl"></div><button onclick="localStorage.removeItem('h');loadH()">Clear History</button></div>
+</section>
+
+<section id="progress" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>📊 Progress</b></div>
+<div class="page"><div id="pg" class="card"></div></div>
+</section>
+
+<section id="bookmarks" class="sec">
+<div class="top"><button onclick="home()">← Back</button><b>🔖 Bookmarks</b></div>
+<div class="page"><div id="bl"></div></div>
+</section>
+
+<script>
+let subject="General",mode="Medium",last="",qi=0,score=0,quiz=[],fi=0;
+
+const data={
+Science:[
+["Which gas do plants use in photosynthesis?",["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],"Carbon dioxide"],
+["SI unit of force?",["Joule","Newton","Pascal","Watt"],"Newton"],
+["Force opposing motion?",["Gravity","Friction","Magnetic","Muscular"],"Friction"]
+],
+Maths:[
+["5 × 8 = ?",["30","35","40","45"],"40"],
+["Square of 12?",["124","144","132","154"],"144"],
+["100 ÷ 4 = ?",["20","25","30","40"],"25"]
+],
+SST:[
+["Who chooses representatives in democracy?",["Citizens","Judges","Police","Army"],"Citizens"],
+["Which is renewable?",["Coal","Petroleum","Sunlight","Gas"],"Sunlight"],
+["Union Legislature of India?",["Parliament","Court","Cabinet","Police"],"Parliament"]
+],
+English:[
+["Which is a pronoun?",["He","School","Beautiful","Run"],"He"],
+["Which is a noun?",["Quickly","School","Beautiful","Run"],"School"],
+["Which is an adjective?",["Beautiful","Run","He","School"],"Beautiful"]
+],
+Hindi:[
+["उपसर्ग कहाँ लगता है?",["पहले","अंत में","बीच में","कहीं भी"],"पहले"],
+["प्रत्यय कहाँ लगता है?",["पहले","अंत में","बीच में","शुरू में"],"अंत में"],
+["सुंदर + ता में 'ता' क्या है?",["उपसर्ग","प्रत्यय","संज्ञा","सर्वनाम"],"प्रत्यय"]
+]};
+
+function hide(){document.getElementById("home").style.display="none";document.querySelectorAll(".sec").forEach(x=>x.style.display="none")}
+function home(){hide();document.getElementById("home").style.display="block";closeDrawer()}
+function show(x){hide();document.getElementById(x).style.display="block";if(x=="history")loadH();if(x=="progress")loadP();if(x=="bookmarks")loadB()}
+function chat(){hide();let x=document.getElementById("chat");x.style.display="flex";x.classList.add("full");if(!document.getElementById("messages").children.length)ai("👋 Hi! I am AGROW.\nAsk me anything!")}
+function drawer(){document.getElementById("drawer").classList.add("open");document.getElementById("shade").classList.add("on")}
+function closeDrawer(){document.getElementById("drawer").classList.remove("open");document.getElementById("shade").classList.remove("on")}
+function sub(x){subject=x;closeDrawer()}
+
+function add(t,c){let d=document.createElement("div");d.className="msg "+c;d.textContent=t;messages.appendChild(d);messages.scrollTop=messages.scrollHeight}
+function ai(t){add(t,"a")}
+
+function send(){
+ let x=q.value.trim();if(!x)return;q.value="";add(x,"u");
+ setTimeout(()=>{last=answer(x);ai(last);save(x,last);count()},400)
+}
+
+function answer(x){
+ let q=x.toLowerCase(),m=q.replace(/×/g,"*").replace(/x/g,"*").replace(/times/g,"*");
+ if(/^[\d\s+\-*\/().]+$/.test(m)){try{return"Answer: "+Function("return "+m)()}catch(e){}}
+ let z=q.match(/(\d+)\s*(?:x|×|\*)\s*(\d+)/);if(z)return"Answer: "+(+z[1]*+z[2]);
+ if(q.includes("photosynthesis"))return"Photosynthesis is the process by which green plants prepare food using sunlight, carbon dioxide and water.\n\nPlants release oxygen during this process.";
+ if(q.includes("friction"))return"Friction is a force that opposes motion between two surfaces in contact.\n\nIt is useful for walking and braking but can cause wear.";
+ if(q.includes("force"))return"Force is a push or pull acting on an object.\n\nSI unit: Newton (N).";
+ if(q.includes("pressure"))return"Pressure is force acting per unit area.\n\nPressure = Force ÷ Area.";
+ if(q.includes("pronoun"))return"A pronoun is a word used in place of a noun.\nExamples: he, she, it, they.";
+ if(q.includes("noun"))return"A noun names a person, place, animal, thing or idea.";
+ if(q.includes("adjective"))return"An adjective describes a noun or pronoun.";
+ if(q.includes("democracy"))return"Democracy is a government in which people choose their representatives through elections.";
+ if(q.includes("adult suffrage"))return"Adult suffrage means the right of adult citizens to vote.";
+ if(q.includes("secret ballot"))return"Secret ballot keeps a voter's choice private.";
+ if(q.includes("renewable"))return"Renewable resources can be naturally replenished. Examples: sunlight, wind and water.";
+ if(q.includes("non renewable"))return"Non-renewable resources are limited and take a very long time to form. Examples: coal and petroleum.";
+ if(q.includes("upasarg")||q.includes("upsarg"))return"उपसर्ग वह शब्दांश है जो शब्द के पहले लगकर उसके अर्थ में परिवर्तन करता है।";
+ if(q.includes("pratyay"))return"प्रत्यय वह शब्दांश है जो शब्द के अंत में जुड़ता है।";
+ if(q.includes("while loop"))return"A while loop repeats code while its condition is true.\nExample:\ni=10\nwhile i>=1:\n print(i)\n i=i-1";
+ if(q.includes("infinite loop"))return"An infinite loop is a loop that never ends because its condition remains true.";
+ if(q.includes("python"))return"Python is a high-level programming language used for programming, automation, AI and many other tasks.";
+ return"🤔 I don't have an offline answer for this question yet.\nTry another question or choose a subject from ☰.";
+}
+
+function save(q,a){let h=JSON.parse(localStorage.h||"[]");h.unshift({q,a,s:subject,d:new Date().toLocaleString()});localStorage.h=JSON.stringify(h.slice(0,100))}
+function loadH(){let h=JSON.parse(localStorage.h||"[]");hl.innerHTML=h.length?h.map(x=>`<div class="card"><b>${x.q}</b><br><small>${x.s} • ${x.d}</small><p>${x.a}</p></div>`).join(""):"No history yet."}
+function count(){let n=+(localStorage.count||0)+1;localStorage.count=n}
+function loadP(){pg.innerHTML="<h2>"+(localStorage.count||0)+"</h2>Questions practised"}
+function bookmark(){if(!last)return;let b=JSON.parse(localStorage.b||"[]");b.unshift(last);localStorage.b=JSON.stringify(b);closeDrawer();alert("Bookmarked 🔖")}
+function loadB(){let b=JSON.parse(localStorage.b||"[]");bl.innerHTML=b.length?b.map(x=>`<div class="card">${x}</div>`).join(""):"No bookmarks yet."}
+function clearChat(){messages.innerHTML="";last="";closeDrawer();ai("Chat cleared.")}
+
+function speak(){if(last&&speechSynthesis)speechSynthesis.speak(new SpeechSynthesisUtterance(last))}
+function voice(){let R=SpeechRecognition||webkitSpeechRecognition;if(!R)return alert("Voice not supported");let r=new R;r.lang="en-IN";r.start();r.onresult=e=>q.value=e.results[0][0].transcript}
+
+function preview(e){let f=e.target.files[0];if(!f)return;let r=new FileReader;r.onload=x=>{pic.src=x.target.result;pv.style.display="block"};r.readAsDataURL(f)}
+function solveScan(){let x=sq.value.trim();sa.textContent=x?answer(x):"Type the question first.";if(x){last=answer(x);save("📸 "+x,last);count()}}
+
+function startQuiz(){quiz=[...(data[qs.value]||[])];quiz.sort(()=>Math.random()-.5);qi=0;score=0;drawQuiz()}
+function drawQuiz(){if(qi>=quiz.length){qa.innerHTML='<div class="score">'+score+' / '+quiz.length+'<br>🎉 Quiz Complete!</div>';return}let x=quiz[qi];qa.innerHTML="<h3>"+(qi+1)+"/"+quiz.length+"</h3><p>"+x[0]+"</p>"+x[1].map((o,i)=>`<button class="option" onclick="pick(${i})">${o}</button>`).join("")}
+function pick(i){let x=quiz[qi],b=document.querySelectorAll(".option");if(x[1][i]==x[2]){score++;b[i].classList.add("correct")}else b[i].classList.add("wrong");setTimeout(()=>{qi++;drawQuiz()},500)}
+
+let cards=[
+["What is photosynthesis?","Plants use sunlight, carbon dioxide and water to make food."],
+["What is friction?","A force that opposes motion between surfaces."],
+["What is democracy?","A government where people choose representatives."],
+["What is a pronoun?","A word used in place of a noun."],
+["What is force?","A push or pull acting on an object."]
+];
+function flashLoad(){fq.textContent=cards[fi][0];fa.textContent=cards[fi][1];fa.style.display="none"}
+function flip(){fa.style.display=fa.style.display=="none"?"block":"none"}
+function nextF(){fi=(fi+1)%cards.length;flashLoad()}
+
+function exp(){let x=topic.value.trim();if(!x)return;ea.textContent=answer(x)+"\n\nExample: Try connecting this concept with a real-life situation."}
+
+flashLoad();home();
+</script>
+</body>
+</html>
